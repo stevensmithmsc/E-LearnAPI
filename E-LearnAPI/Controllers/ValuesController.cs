@@ -11,9 +11,9 @@ namespace E_LearnAPI.Controllers
     public class ValuesController : ApiController
     {
         // GET api/values
-        public IEnumerable<string> Get()
+        public string Get()
         {
-            return new string[] { "value1", "value2" };
+            return User.Identity.Name;
         }
 
         // GET api/values/5

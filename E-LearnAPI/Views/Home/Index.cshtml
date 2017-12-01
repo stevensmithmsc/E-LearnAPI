@@ -5,11 +5,26 @@
 </div>
 <div class="row">
     <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+        <form id="newres" action="/api/ELResults" method="post">
+            <label for="personid">Person ID</label>
+            <input name="personid" id="personid" /><br />
+            <label for="personname">Person Name</label>
+            <input name="personname" id="personname" /><br />
+            <label for="courseid">Course ID</label>
+            <input name="courseid" id="courseid" /><br />
+            <label for="coursedesc">Course Description</label>
+            <input name="coursedesc" id="coursedesc" /><br />
+            <label for="score">Score</label>
+            <input name="score" id="score" /><br />
+            <label for="maxscore">Maximum Score</label>
+            <input name="maxscore" id="maxscore" /><br />
+            <label for="passfail">Pass or Fail</label>
+            <select name="passfail" id="passfail">
+                <option value="true">Pass</option>
+                <option value="false">Fail</option>
+            </select><br />
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
     </div>
     <div class="col-md-4">
         <h2>Get more libraries</h2>
@@ -22,3 +37,33 @@
         <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
     </div>
 </div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $( '#newres' ).submit(function (e) {
+                e.preventDefault();
+                //alert("Hi");
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ELResults",
+                    data: $("#newres").serialize(),
+                    success: function (data) {
+                        alert("Success");
+                        console.log(data);
+                        $('#newres')[0].reset();
+                    },
+                    error: function (data) {
+                        alert("There was a problem");
+                        console.log(data);
+                    }
+                });
+            });
+
+            //alert("Hello");
+        });
+
+
+    </script>
+}
