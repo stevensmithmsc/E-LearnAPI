@@ -1,45 +1,11 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <form id="newres" action="/api/ELResults" method="post">
-            <label for="personid">Person ID</label>
-            <input name="personid" id="personid" /><br />
-            <label for="personname">Person Name</label>
-            <input name="personname" id="personname" /><br />
-            <label for="courseid">Course ID</label>
-            <input name="courseid" id="courseid" /><br />
-            <label for="coursedesc">Course Description</label>
-            <input name="coursedesc" id="coursedesc" /><br />
-            <label for="score">Score</label>
-            <input name="score" id="score" /><br />
-            <label for="maxscore">Maximum Score</label>
-            <input name="maxscore" id="maxscore" /><br />
-            <label for="passfail">Pass or Fail</label>
-            <select name="passfail" id="passfail">
-                <option value="true">Pass</option>
-                <option value="false">Fail</option>
-            </select><br />
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
-</div>
+﻿<div id="app"></div>
+
 
 @section scripts
 {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-dom.js"></script>
+    <script src="@Url.Content("~/Scripts/ELearningResults.jsx")"></script>
     <script>
         $(document).ready(function () {
             $( '#newres' ).submit(function (e) {
