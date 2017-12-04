@@ -232,9 +232,21 @@
     <Compile Include="Migrations\201712011513549_Create Results Table.Designer.cs">
       <DependentUpon>201712011513549_Create Results Table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712041353573_add other tables to DB &amp; App.cs" />
+    <Compile Include="Migrations\201712041353573_add other tables to DB &amp; App.Designer.cs">
+      <DependentUpon>201712041353573_add other tables to DB &amp; App.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Course.cs" />
     <Compile Include="Models\ELResult.cs" />
+    <Compile Include="Models\EntityConfigurations\CourseConfiguration.cs" />
     <Compile Include="Models\EntityConfigurations\ELResultsConfiguration.cs" />
+    <Compile Include="Models\EntityConfigurations\PersonConfiguration.cs" />
+    <Compile Include="Models\EntityConfigurations\RequirementConfiguration.cs" />
+    <Compile Include="Models\EntityConfigurations\StatusConfiguration.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\Requirement.cs" />
+    <Compile Include="Models\Status.cs" />
     <Compile Include="Models\TrainingDatabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -310,6 +322,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201712011513549_Create Results Table.resx">
       <DependentUpon>201712011513549_Create Results Table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712041353573_add other tables to DB &amp; App.resx">
+      <DependentUpon>201712041353573_add other tables to DB &amp; App.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

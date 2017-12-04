@@ -23,11 +23,19 @@ namespace E_LearnAPI.Models
 
         // public virtual DbSet<MyEntity> MyEntities { get; set; }
         public virtual DbSet<ELResult> ELResults { get; set; }
+        public virtual DbSet<Person> People { get; set; }
+        public virtual DbSet<Course> Courses { get; set; }
+        public virtual DbSet<Status> Statuses { get; set; }
+        public virtual DbSet<Requirement> Requirements { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new ELResultsConfiguration());
+            modelBuilder.Configurations.Add(new PersonConfiguration());
+            modelBuilder.Configurations.Add(new CourseConfiguration());
+            modelBuilder.Configurations.Add(new StatusConfiguration());
+            modelBuilder.Configurations.Add(new RequirementConfiguration());
         }
     }
 
