@@ -87,6 +87,8 @@ namespace E_LearnAPI.Controllers
             db.ELResults.Add(eLResult);
             await db.SaveChangesAsync();
 
+            await ProcessResultAsync(eLResult);
+
             return CreatedAtRoute("DefaultApi", new { id = eLResult.Id }, eLResult);
         }
 
@@ -115,17 +117,45 @@ namespace E_LearnAPI.Controllers
             base.Dispose(disposing);
         }
 
-        private void ProcessResult(ELResult eLResult)
+        private async Task ProcessResultAsync(ELResult eLResult)
         {
             //Find Person
-
+            var person = await db.People.SingleOrDefaultAsync(p => p.ID == eLResult.PersonId);
+            if (person == null)
+            {
+                eLResult.Comments = "Unable to find staff member with matching ID";
+                await db.SaveChangesAsync();
+                return;
+            }
             //Find Course
-
+            var course = await db.Courses.SingleOrDefaultAsync(c => c.ID == eLResult.CourseId);
+            if (course == null)
+            {
+                eLResult.Comments = "Unable to find course with matching ID";
+                await db.SaveChangesAsync();
+                return;
+            }
             //Find Requirement
-
+            var req = await db.Requirements.SingleOrDefaultAsync(r => r.Staff == eLResult.PersonId && r.Course == eLResult.CourseId);
+            if (req == null)
+            {
+                eLResult.Comments = "Staff member does not have requirement for course.";
+                await db.SaveChangesAsync();
+                return;
+            }
             //Update Requirement
-
+            if (eLResult.PassFail != null)
+            {
+                req.Status = (bool)(eLResult.PassFail) ? (short)5 : (short)2;
+            } else
+            {
+                eLResult.Comments = "No Pass or Fail included in message";
+                await db.SaveChangesAsync();
+                return;
+            }
             //Update Result
+            eLResult.Processed = true;
+            await db.SaveChangesAsync();
         }
 
         private bool ELResultExists(int id)
