@@ -13,6 +13,8 @@ namespace E_LearnAPI.Models
 
         public string Sname { get; set; }
 
+        public int? ESRID { get; set; }
+
         public string ADAccount { get; set; }
 
         public virtual ICollection<Requirement> Requirements { get; set; }

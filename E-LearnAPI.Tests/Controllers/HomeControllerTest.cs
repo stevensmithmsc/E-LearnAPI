@@ -19,7 +19,7 @@ namespace E_LearnAPI.Tests.Controllers
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("Home Page", result.ViewBag.Title);
+            Assert.AreEqual("E-Learning Results Processing", result.ViewBag.Title);
         }
     }
 }

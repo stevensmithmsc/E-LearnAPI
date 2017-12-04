@@ -236,6 +236,10 @@
     <Compile Include="Migrations\201712041353573_add other tables to DB &amp; App.Designer.cs">
       <DependentUpon>201712041353573_add other tables to DB &amp; App.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712041506587_Add ESRID to Person Record.cs" />
+    <Compile Include="Migrations\201712041506587_Add ESRID to Person Record.Designer.cs">
+      <DependentUpon>201712041506587_Add ESRID to Person Record.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\ELResult.cs" />
@@ -325,6 +329,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712041353573_add other tables to DB &amp; App.resx">
       <DependentUpon>201712041353573_add other tables to DB &amp; App.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712041506587_Add ESRID to Person Record.resx">
+      <DependentUpon>201712041506587_Add ESRID to Person Record.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

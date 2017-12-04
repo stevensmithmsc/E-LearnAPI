@@ -120,7 +120,7 @@ namespace E_LearnAPI.Controllers
         private async Task ProcessResultAsync(ELResult eLResult)
         {
             //Find Person
-            var person = await db.People.SingleOrDefaultAsync(p => p.ID == eLResult.PersonId);
+            var person = await db.People.SingleOrDefaultAsync(p => p.ESRID == eLResult.PersonId);
             if (person == null)
             {
                 eLResult.Comments = "Unable to find staff member with matching ID";
@@ -136,7 +136,7 @@ namespace E_LearnAPI.Controllers
                 return;
             }
             //Find Requirement
-            var req = await db.Requirements.SingleOrDefaultAsync(r => r.Staff == eLResult.PersonId && r.Course == eLResult.CourseId);
+            var req = await db.Requirements.SingleOrDefaultAsync(r => r.Staff == person.ID && r.Course == eLResult.CourseId);
             if (req == null)
             {
                 eLResult.Comments = "Staff member does not have requirement for course.";

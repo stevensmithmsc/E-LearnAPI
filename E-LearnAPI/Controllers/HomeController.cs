@@ -10,7 +10,7 @@ namespace E_LearnAPI.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
+            ViewBag.Title = "E-Learning Results Processing";
 
             return View();
         }
