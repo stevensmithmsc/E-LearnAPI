@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.Cors;
 using E_LearnAPI.Models;
 
 namespace E_LearnAPI.Controllers
@@ -73,6 +74,7 @@ namespace E_LearnAPI.Controllers
 
         // POST: api/ELResults
         [ResponseType(typeof(ELResult))]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<IHttpActionResult> PostELResult(ELResult eLResult)
         {
             eLResult.Received = DateTime.Now;
