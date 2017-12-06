@@ -1,4 +1,47 @@
-﻿class DataTable extends React.Component {
+﻿class SearchForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { nameSearch: "", nonProc: true };
+    }
+    handleChange(e) {
+        var newObj = {};
+        newObj[e.target.id] = e.target.value;
+        this.setState(newObj);
+    }
+    handleCheckBoxChange(e) {
+        var newObj = {};
+        newObj[e.target.id] = e.target.checked;
+        this.setState(newObj);
+    }
+    handleSubmit(e) {
+        e.preventDefault();
+        this.props.search(this.state);
+    }
+
+    render() {
+        return (
+            <div hidden={!this.props.vis} >
+                <form className="form-inline" onSubmit={this.handleSubmit.bind(this)}>
+                    <div className="form-group">
+                        <label htmlFor="nameSearch">Name </label>
+                        <input type="text" className="form-control" id="nameSearch" onChange={this.handleChange.bind(this)} value={this.state.nameSearch} />
+                    </div> &nbsp;
+                    <div className="checkbox">
+                        <label>
+                            <input type="checkbox" onChange={this.handleCheckBoxChange.bind(this)} id="nonProc" checked={this.state.nonProc}/> Non processed results only
+                        </label>
+                    </div> &nbsp;
+                    <button type="submit" className="btn btn-success">
+                        <span className="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        &nbsp;Search
+                    </button>
+                </form>
+            </div>
+            )          
+    }
+}
+
+class DataTable extends React.Component {
     
 
     render() {
@@ -145,7 +188,7 @@ class ELearnForm extends React.Component {
 class ELearningResultsApp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { message: "Fetching Results", data: [], selected: {} };
+        this.state = { message: "Fetching Results", data: [], selected: {}, showSearch: false };
     }
 
     componentDidMount() {
@@ -181,10 +224,36 @@ class ELearningResultsApp extends React.Component {
         $('#editForm').modal('show');
     }
 
+    toggleSearch() {
+        this.setState({ showSearch: !this.state.showSearch });
+    }
+
+    handleSearch(s) {
+        var queryString = "";
+        if (s.nameSearch != "") {
+            queryString += "?search=" + s.nameSearch;
+        }
+        if (s.nonProc) {
+            queryString += (s.nameSearch == "") ? "?processed=false" : "&processed=false";
+        }
+        var ajaxSuccess = this.ajaxSuccess.bind(this);
+
+        $.ajax({
+            type: "GET",
+            url: "api/ELResults" + queryString,
+            success: ajaxSuccess,
+            error: function (result) {
+                alert('Error fetching results!');
+                console.log(result);
+            }
+        });
+    }
+
     render() {
         return (
             <div>
-                <h2>{this.state.message}</h2>
+                <h2>{this.state.message} <span id="searchIcon" className="glyphicon glyphicon-search" aria-hidden="true" onClick={this.toggleSearch.bind(this)}></span></h2>
+                <SearchForm vis={this.state.showSearch} search={this.handleSearch.bind(this)}/>
                 <DataTable data={this.state.data} handleSelection={this.handleResultSelection.bind(this)}/>
                 <EditForm record={this.state.selected}/>
                 <hr />
@@ -199,17 +268,3 @@ ReactDOM.render(
     <ELearningResultsApp/>,
     document.getElementById('app')
 );
-
-//var CommentBox = React.createClass({
-//    render: function () {
-//        return (
-//            <div className="commentBox">
-//                Hello, world! I am a CommentBox.
-//      </div>
-//        );
-//    }
-//});
-//ReactDOM.render(
-//    <CommentBox />,
-//    document.getElementById('app')
-//);
