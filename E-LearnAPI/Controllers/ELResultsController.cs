@@ -18,12 +18,26 @@ namespace E_LearnAPI.Controllers
     {
         private TrainingDatabase db = new TrainingDatabase();
 
+        [Authorize]
         // GET: api/ELResults
-        public IQueryable<ELResult> GetELResults()
+        public IQueryable<ELResult> GetELResults(string search = null, bool? processed = null)
         {
-            return db.ELResults;
+            var result = (IQueryable<ELResult>)db.ELResults;
+
+            if (search != null)
+            {
+                result = result.Where(r => r.PersonName.Contains(search));
+            }
+
+            if (processed != null)
+            {
+                result = result.Where(r => r.Processed == processed);
+            }
+
+            return result.Take(100);
         }
 
+        [Authorize]
         // GET: api/ELResults/5
         [ResponseType(typeof(ELResult))]
         public async Task<IHttpActionResult> GetELResult(int id)
@@ -37,6 +51,7 @@ namespace E_LearnAPI.Controllers
             return Ok(eLResult);
         }
 
+        [Authorize]
         // PUT: api/ELResults/5
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutELResult(int id, ELResult eLResult)
@@ -94,6 +109,7 @@ namespace E_LearnAPI.Controllers
             return CreatedAtRoute("DefaultApi", new { id = eLResult.Id }, eLResult);
         }
 
+        [Authorize]
         // DELETE: api/ELResults/5
         [ResponseType(typeof(ELResult))]
         public async Task<IHttpActionResult> DeleteELResult(int id)

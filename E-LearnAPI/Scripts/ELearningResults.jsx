@@ -2,9 +2,11 @@
     
 
     render() {
-        rowClicked = function (id) {
-            $('#editForm').modal('show');
-        }
+        //rowClicked = function (id) {
+        //    console.log(id);
+        //    $('#editForm').modal('show');
+        //    this.props.handleSelection(id);
+        //}
 
         return (
             <table className="table table-hover datatable">
@@ -20,7 +22,7 @@
                 </thead>
                 <tbody>
                 {this.props.data.map(d => (
-                        <tr key={d.Id} onClick={() => rowClicked(d.Id)}>
+                        <tr key={d.Id} onClick={() => this.props.handleSelection(d.Id)}>
                             <td>{d.PersonName}</td>
                             <td>{d.CourseDesc}</td>
                             <td>{d.Score}</td>
@@ -46,11 +48,36 @@ class EditForm extends React.Component {
                             <h4 className="modal-title">Edit Result</h4>
                         </div>
                         <div className="modal-body">
-                            <p>One fine body&hellip;</p>
+                            <dl className="dl-horizontal">
+                                <dt>ID:</dt>
+                                <dd>{this.props.record.Id}</dd>
+                                <dt>Person ESR ID:</dt>
+                                <dd>{this.props.record.PersonId}</dd>
+                                <dt>Person name:</dt>
+                                <dd>{this.props.record.PersonName}</dd>
+                                <dt>Course ID:</dt>
+                                <dd>{this.props.record.CourseId}</dd>
+                                <dt>Course Description:</dt>
+                                <dd>{this.props.record.CourseDesc}</dd>
+                                <dt>Score:</dt>
+                                <dd>{this.props.record.Score}</dd>
+                                <dt>Max Score:</dt>
+                                <dd>{this.props.record.MaxScore}</dd>
+                                <dt>Passed or Failed:</dt>
+                                <dd>{this.props.record.PassFail ? "Passed" : "Failed"}</dd>
+                                <dt>Received:</dt>
+                                <dd>{this.props.record.Received}</dd>
+                                <dt>From AD Account:</dt>
+                                <dd>{this.props.record.FromADAcc}</dd>
+                                <dt>Processed:</dt>
+                                <dd>{this.props.record.Processed ? "Processed" : "Not Processed"}</dd>
+                                <dt>Comments:</dt>
+                                <dd>{this.props.record.Comments}</dd>
+                            </dl>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary">Save changes</button>
+                            <button type="button" className="btn btn-primary disabled">Save changes</button>
                         </div>
                     </div>
                   </div>
@@ -118,7 +145,7 @@ class ELearnForm extends React.Component {
 class ELearningResultsApp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { message: "Fetching Results", data: [] };
+        this.state = { message: "Fetching Results", data: [], selected: {} };
     }
 
     componentDidMount() {
@@ -133,7 +160,7 @@ class ELearningResultsApp extends React.Component {
 
         $.ajax({
             type: "GET",
-            url: "api/ELResults",
+            url: "api/ELResults?processed=false",
             success: ajaxSuccess,
             error: function (result) {
                 alert('Error fetching results!');
@@ -148,12 +175,18 @@ class ELearningResultsApp extends React.Component {
         this.setState({ message: "E-Learning Results", data: result });
     }
 
+    handleResultSelection(id) {
+        var result = this.state.data.filter(function (o) { return o.Id == id; });
+        this.setState({ selected: result[0] });
+        $('#editForm').modal('show');
+    }
+
     render() {
         return (
             <div>
                 <h2>{this.state.message}</h2>
-                <DataTable data={this.state.data} />
-                <EditForm />
+                <DataTable data={this.state.data} handleSelection={this.handleResultSelection.bind(this)}/>
+                <EditForm record={this.state.selected}/>
                 <hr />
                 <h4>Manually Add Result:</h4>
                 <ELearnForm />

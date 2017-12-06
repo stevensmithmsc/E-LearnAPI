@@ -8,6 +8,7 @@ namespace E_LearnAPI.Controllers
 {
     public class HomeController : Controller
     {
+        [Authorize]
         public ActionResult Index()
         {
             ViewBag.Title = "E-Learning Results Processing";
