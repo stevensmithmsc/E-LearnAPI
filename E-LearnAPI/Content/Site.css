@@ -23,3 +23,11 @@ textarea {
 #searchIcon {
     cursor: pointer;
 }
+
+.dataTablePages {
+    text-align: right;
+}
+
+.pagination {
+    cursor: pointer;
+}

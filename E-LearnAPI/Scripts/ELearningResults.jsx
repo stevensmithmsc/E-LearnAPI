@@ -41,6 +41,42 @@
     }
 }
 
+class PaginatorNumber extends React.Component {
+    render() {
+        return (
+            <li><span onClick={() => this.props.goToPage(this.props.number)}>{this.props.number}</span></li>
+            )
+    }
+}
+
+class Paginator extends React.Component {
+    render() {
+        var pages = [];
+        var strt = this.props.startAt;
+        for (var i = 0; i < this.props.pages; i++) {
+            if ((strt + i) == this.props.current) {
+                pages.push(<li key={i} className="active"><span>{strt + i}<span className="sr-only">(current)</span></span></li>)
+            } else {
+                pages.push(<PaginatorNumber key={i} number={i + strt} goToPage={this.props.goToPage} />)
+            }
+        }
+
+        return (
+            <nav aria-label="Page navigation" className="dataTablePages">
+                <ul className="pagination">
+                    <li className={this.props.current == this.props.startAt ? "disabled" : ""} onClick={this.props.decreasePage}>
+                        <span aria-label="Previous" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {pages}
+                    <li className={this.props.current == (this.props.startAt + this.props.pages - 1) ? "disabled" : ""} onClick={this.props.increasePage}>
+                        <span aria-label="Next" aria-hidden="true">&raquo;</span>
+                    </li>
+                </ul>
+            </nav>
+            )
+    }
+}
+
 class DataTable extends React.Component {
     
 
@@ -120,7 +156,7 @@ class EditForm extends React.Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary disabled">Save changes</button>
+                            <button type="button" className="btn btn-primary" disabled="disabled">Save changes</button>
                         </div>
                     </div>
                   </div>
@@ -188,7 +224,8 @@ class ELearnForm extends React.Component {
 class ELearningResultsApp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { message: "Fetching Results", data: [], selected: {}, showSearch: false };
+        this.state = { message: "Fetching Results...", data: [], selected: {}, showSearch: false, totalPages:0, currentPage: 1 };
+        this.handleGoToPage = this.handleGoToPage.bind(this);
     }
 
     componentDidMount() {
@@ -215,7 +252,8 @@ class ELearningResultsApp extends React.Component {
     }
 
     ajaxSuccess(result) {
-        this.setState({ message: "E-Learning Results", data: result });
+        var totPage = Math.floor((result.length - 1)/ 20) + 1;
+        this.setState({ message: "E-Learning Results", data: result, totalPages: totPage, currentPage: 1, startAt: 1 });
     }
 
     handleResultSelection(id) {
@@ -238,6 +276,8 @@ class ELearningResultsApp extends React.Component {
         }
         var ajaxSuccess = this.ajaxSuccess.bind(this);
 
+        this.setState({ message: "Searching..." });
+
         $.ajax({
             type: "GET",
             url: "api/ELResults" + queryString,
@@ -249,12 +289,30 @@ class ELearningResultsApp extends React.Component {
         });
     }
 
+    handleIncreasePage() {
+        var newPage = this.state.currentPage >= this.state.totalPages ? this.state.totalPages : (this.state.currentPage + 1);
+        this.handleGoToPage(newPage);
+    }
+
+    handleDecreasePage() {
+        var newPage = this.state.currentPage <= 1 ? 1 : (this.state.currentPage - 1);
+        this.handleGoToPage(newPage);
+    }
+
+    handleGoToPage(p) {
+        console.log(p);
+        var topPage = (p + 2) > this.state.totalPages ? this.state.totalPages : (p + 2);
+        var startPage = (topPage - 4) < 1 ? 1 : (topPage - 4);
+        this.setState({ currentPage: p, startAt: startPage });
+    }
+
     render() {
         return (
             <div>
                 <h2>{this.state.message} <span id="searchIcon" className="glyphicon glyphicon-search" aria-hidden="true" onClick={this.toggleSearch.bind(this)}></span></h2>
                 <SearchForm vis={this.state.showSearch} search={this.handleSearch.bind(this)}/>
-                <DataTable data={this.state.data} handleSelection={this.handleResultSelection.bind(this)}/>
+                <DataTable data={this.state.totalPages > 1 ? this.state.data.slice(((this.state.currentPage - 1)*20), (this.state.currentPage*20)) : this.state.data} handleSelection={this.handleResultSelection.bind(this)} />
+                <Paginator pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
                 <EditForm record={this.state.selected}/>
                 <hr />
                 <h4>Manually Add Result:</h4>
