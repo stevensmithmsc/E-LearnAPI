@@ -283,7 +283,7 @@ class ELearningResultsApp extends React.Component {
     }
 
     ajaxSuccess(result) {
-        var totPage = Math.floor((result.length - 1)/ 20) + 1;
+        var totPage = Math.floor((result.length - 1)/ this.props.pageSize) + 1;
         this.setState({ message: "E-Learning Results", data: result, totalPages: totPage, currentPage: 1, startAt: 1 });
     }
 
@@ -331,7 +331,6 @@ class ELearningResultsApp extends React.Component {
     }
 
     handleGoToPage(p) {
-        console.log(p);
         var topPage = (p + 2) > this.state.totalPages ? this.state.totalPages : (p + 2);
         var startPage = (topPage - 4) < 1 ? 1 : (topPage - 4);
         this.setState({ currentPage: p, startAt: startPage });
@@ -340,7 +339,7 @@ class ELearningResultsApp extends React.Component {
     handleNewResult(s) {
         var currentData = this.state.data;
         currentData.push(s);
-        var totPage = Math.floor((currentData.length - 1) / 20) + 1;
+        var totPage = Math.floor((currentData.length - 1) / this.props.pageSize) + 1;
         this.setState({ data: currentData, totalPages: totPage });
     }
 
@@ -349,7 +348,7 @@ class ELearningResultsApp extends React.Component {
             <div>
                 <h2>{this.state.message} <span id="searchIcon" className="glyphicon glyphicon-search" aria-hidden="true" onClick={this.toggleSearch.bind(this)}></span></h2>
                 <SearchForm vis={this.state.showSearch} search={this.handleSearch.bind(this)}/>
-                <DataTable data={this.state.totalPages > 1 ? this.state.data.slice(((this.state.currentPage - 1)*20), (this.state.currentPage*20)) : this.state.data} handleSelection={this.handleResultSelection.bind(this)} />
+                <DataTable data={this.state.totalPages > 1 ? this.state.data.slice(((this.state.currentPage - 1)*this.props.pageSize), (this.state.currentPage*this.props.pageSize)) : this.state.data} handleSelection={this.handleResultSelection.bind(this)} />
                 <Paginator vis={this.state.totalPages > 1 ? true : false} pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
                 <EditForm record={this.state.selected}/>
                 <hr />
@@ -361,6 +360,6 @@ class ELearningResultsApp extends React.Component {
 }
 
 ReactDOM.render(
-    <ELearningResultsApp/>,
+    <ELearningResultsApp pageSize={20} />,
     document.getElementById('app')
 );
