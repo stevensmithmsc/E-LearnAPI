@@ -31,3 +31,7 @@ textarea {
 .pagination {
     cursor: pointer;
 }
+
+.large-field {
+    width: 100%;
+}

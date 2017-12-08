@@ -62,7 +62,7 @@ class Paginator extends React.Component {
         }
 
         return (
-            <nav aria-label="Page navigation" className="dataTablePages">
+            <nav aria-label="Page navigation" className="dataTablePages" hidden={!this.props.vis}>
                 <ul className="pagination">
                     <li className={this.props.current == this.props.startAt ? "disabled" : ""} onClick={this.props.decreasePage}>
                         <span aria-label="Previous" aria-hidden="true">&laquo;</span>
@@ -81,12 +81,6 @@ class DataTable extends React.Component {
     
 
     render() {
-        //rowClicked = function (id) {
-        //    console.log(id);
-        //    $('#editForm').modal('show');
-        //    this.props.handleSelection(id);
-        //}
-
         return (
             <table className="table table-hover datatable">
                 <thead>
@@ -166,49 +160,86 @@ class EditForm extends React.Component {
 }
 
 class ELearnForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { };
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    ajaxSuccess(data) {
+        $('#newres')[0].reset();
+        this.props.newResult(data);
+    }
+
+    handleSubmit(e) {
+        e.preventDefault();
+        var ajaxSuccess = this.ajaxSuccess.bind(this);
+        this.setState({
+            PersonId: this.refs.personId.value,
+            PersonName: this.refs.personName.value,
+            CourseId: this.refs.courseId.value,
+            CourseDesc: this.refs.courseDesc.value,
+            Score: this.refs.score.value,
+            MaxScore: this.refs.maxScore.value,
+            PassFail: this.refs.passFail.value
+        }, () => {
+            $.ajax({
+                type: "POST",
+                url: "/api/ELResults",
+                data: this.state,
+                success: ajaxSuccess,
+                error: function (data) {
+                    alert("There was a problem");
+                    console.log(data);
+                }
+            });
+        });
+
+    }
+
     render() {
         return (
-            <form id="newres" className="form-horizontal">
+            <form id="newres" className="form-horizontal" onSubmit={this.handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="personid" className="col-sm-2 control-label">Person ID</label>
+                    <label htmlFor="personId" className="col-sm-2 control-label" >Person ID</label>
                     <div className="col-sm-10">
-                        <input name="personid" id="personid" className="form-control" placeholder="Please enter Staff ESR ID"/>
+                        <input name="personId" id="personId" ref="personId" className="form-control" placeholder="Please enter Staff ESR ID" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="personname" className="col-sm-2 control-label" >Person Name</label>
+                    <label htmlFor="personName" className="col-sm-2 control-label" >Person Name</label>
                     <div className="col-sm-10">
-                        <input name="personname" id="personname" className="form-control" placeholder="Please enter Staff Members Name"/>
+                        <input name="personName" id="personName" ref="personName" className="form-control large-field" placeholder="Please enter Staff Members Name" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="courseid" className="col-sm-2 control-label">Course ID</label>
+                    <label htmlFor="courseId" className="col-sm-2 control-label">Course ID</label>
                     <div className="col-sm-10">
-                        <input name="courseid" id="courseid" className="form-control" placeholder="Please enter course ID"/>
+                        <input name="courseId" id="courseId" ref="courseId" className="form-control" placeholder="Please enter course ID" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="coursedesc" className="col-sm-2 control-label">Course Description</label>
+                    <label htmlFor="courseDesc" className="col-sm-2 control-label">Course Description</label>
                     <div className="col-sm-10">
-                        <input name="coursedesc" id="coursedesc" className="form-control" placeholder="Please enter course Name"/>
+                        <input name="courseDesc" id="courseDesc" ref="courseDesc" className="form-control large-field" placeholder="Please enter course Name" />
                     </div>
                 </div>
                 <div className="form-group">
                     <label htmlFor="score" className="col-sm-2 control-label">Score</label>
                     <div className="col-sm-10">
-                        <input name="score" id="score" className="form-control" type="number" placeholder="Please enter score"/>
+                        <input name="score" id="score" ref="score" className="form-control" type="number" placeholder="Please enter score" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="maxscore" className="col-sm-2 control-label">Maximum Score</label>
+                    <label htmlFor="maxScore" className="col-sm-2 control-label">Maximum Score</label>
                     <div className="col-sm-10">
-                        <input name="maxscore" id="maxscore" className="form-control" type="number" placeholder="Please enter maximum score" />
+                        <input name="maxScore" id="maxScore" ref="maxScore" className="form-control" type="number" placeholder="Please enter maximum score" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="passfail" className="col-sm-2 control-label">Pass or Fail</label>
+                    <label htmlFor="passFail" className="col-sm-2 control-label">Pass or Fail</label>
                     <div className="col-sm-10">
-                        <select name="passfail" id="passfail" className="form-control">
+                        <select name="passFail" id="passFail" ref="passFail" className="form-control">
                             <option value="true">Pass</option>
                             <option value="false">Fail</option>
                         </select>
@@ -306,17 +337,24 @@ class ELearningResultsApp extends React.Component {
         this.setState({ currentPage: p, startAt: startPage });
     }
 
+    handleNewResult(s) {
+        var currentData = this.state.data;
+        currentData.push(s);
+        var totPage = Math.floor((currentData.length - 1) / 20) + 1;
+        this.setState({ data: currentData, totalPages: totPage });
+    }
+
     render() {
         return (
             <div>
                 <h2>{this.state.message} <span id="searchIcon" className="glyphicon glyphicon-search" aria-hidden="true" onClick={this.toggleSearch.bind(this)}></span></h2>
                 <SearchForm vis={this.state.showSearch} search={this.handleSearch.bind(this)}/>
                 <DataTable data={this.state.totalPages > 1 ? this.state.data.slice(((this.state.currentPage - 1)*20), (this.state.currentPage*20)) : this.state.data} handleSelection={this.handleResultSelection.bind(this)} />
-                <Paginator pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
+                <Paginator vis={this.state.totalPages > 1 ? true : false} pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
                 <EditForm record={this.state.selected}/>
                 <hr />
                 <h4>Manually Add Result:</h4>
-                <ELearnForm />
+                <ELearnForm newResult={this.handleNewResult.bind(this)}/>
             </div>
         );
     }

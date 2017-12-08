@@ -6,30 +6,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-dom.js"></script>
     <script src="@Url.Content("~/Scripts/ELearningResults.jsx")"></script>
-    <script>
-        $(document).ready(function () {
-            $( '#newres' ).submit(function (e) {
-                e.preventDefault();
-                //alert("Hi");
-                $.ajax({
-                    type: "POST",
-                    url: "/api/ELResults",
-                    data: $("#newres").serialize(),
-                    success: function (data) {
-                        alert("Success");
-                        console.log(data);
-                        $('#newres')[0].reset();
-                    },
-                    error: function (data) {
-                        alert("There was a problem");
-                        console.log(data);
-                    }
-                });
-            });
-
-            //alert("Hello");
-        });
-
-
-    </script>
+ 
 }
