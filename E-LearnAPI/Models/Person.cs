@@ -19,6 +19,8 @@ namespace E_LearnAPI.Models
 
         public virtual ICollection<Requirement> Requirements { get; set; }
 
+        public virtual ReportAccess ReportAccess { get; set; }
+
         public Person()
         {
             this.Requirements = new HashSet<Requirement>();

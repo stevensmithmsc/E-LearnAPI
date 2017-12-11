@@ -27,6 +27,7 @@ namespace E_LearnAPI.Models
         public virtual DbSet<Course> Courses { get; set; }
         public virtual DbSet<Status> Statuses { get; set; }
         public virtual DbSet<Requirement> Requirements { get; set; }
+        public virtual DbSet<ReportAccess> Access { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -36,6 +37,7 @@ namespace E_LearnAPI.Models
             modelBuilder.Configurations.Add(new CourseConfiguration());
             modelBuilder.Configurations.Add(new StatusConfiguration());
             modelBuilder.Configurations.Add(new RequirementConfiguration());
+            modelBuilder.Configurations.Add(new ReportAccessConfiguration());
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using E_LearnAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,10 +13,18 @@ namespace E_LearnAPI.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ValuesController : ApiController
     {
+        private TrainingDatabase db = new TrainingDatabase();
+
         // GET api/values
-        public string Get()
+        public short Get()
         {
-            return User.Identity.Name;
+            Person userPerson = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name);
+            if (userPerson != null)
+            {
+                short AccLvl = userPerson.ReportAccess.AccessLevel;
+                return AccLvl;
+            }
+            return 0;
         }
 
         // GET api/values/5
@@ -24,6 +33,13 @@ namespace E_LearnAPI.Controllers
             return "value";
         }
 
-        
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }
