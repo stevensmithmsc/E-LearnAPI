@@ -19,6 +19,9 @@ namespace E_LearnAPI.Models.EntityConfigurations
 
             HasRequired(r => r.Staff)
                 .WithOptional(p => p.ReportAccess);
+
+            Property(r => r.AccessLevel)
+                .HasColumnName("ELearn");
                 
         }
     }
