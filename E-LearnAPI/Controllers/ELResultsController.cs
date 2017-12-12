@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Http.Cors;
 using E_LearnAPI.Models;
+using E_LearnAPI.DTOs;
 
 namespace E_LearnAPI.Controllers
 {
@@ -54,19 +55,27 @@ namespace E_LearnAPI.Controllers
         [Authorize]
         // PUT: api/ELResults/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutELResult(int id, ELResult eLResult)
+        public async Task<IHttpActionResult> PutELResult(int id, ResultUpdateDto resultDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != eLResult.Id)
+            if (id != resultDTO.Id)
             {
                 return BadRequest();
             }
 
-            db.Entry(eLResult).State = EntityState.Modified;
+            //db.Entry(eLResult).State = EntityState.Modified;
+            ELResult eLResult = await db.ELResults.FindAsync(id);
+            if (eLResult == null)
+            {
+                return NotFound();
+            }
+
+            eLResult.Processed = resultDTO.Processed;
+            eLResult.Comments = resultDTO.Comments;
 
             try
             {
@@ -82,6 +91,11 @@ namespace E_LearnAPI.Controllers
                 {
                     throw;
                 }
+            }
+
+            if (!eLResult.Processed)
+            {
+                await ProcessResultAsync(eLResult);
             }
 
             return StatusCode(HttpStatusCode.NoContent);

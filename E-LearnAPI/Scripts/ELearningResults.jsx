@@ -111,6 +111,34 @@ class DataTable extends React.Component {
 }
 
 class EditForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { comments: "", processed: false }
+    }
+    componentWillReceiveProps(props) {
+        var commentField = (props.record.Comments) ? props.record.Comments : "";
+        this.setState({ comments: commentField, processed: props.record.Processed });
+    }
+    handleChange(e) {
+        var newObj = {};
+        newObj[e.target.id] = e.target.value;
+        this.setState(newObj);
+    }
+    handleCheckBoxChange(e) {
+        var newObj = {};
+        newObj[e.target.id] = e.target.checked;
+        this.setState(newObj);
+    }
+    handleSave() {
+        this.setState({ id: this.props.record.Id }, () => { this.props.editResult(this.state) });
+        $('#editForm').modal('hide');
+    }
+    handleDelete() {
+        if (confirm("Are you sure you want to delete this result?  This cannot be undone!")) {
+            this.props.deleteResult(this.props.record.Id);
+            $('#editForm').modal('hide');
+        }
+    }
     render() {
         return (
             <div id="editForm" className="modal fade" tabIndex="-1" role="dialog">
@@ -118,7 +146,7 @@ class EditForm extends React.Component {
                     <div className="modal-content">
                         <div className="modal-header">
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 className="modal-title">Edit Result</h4>
+                            <h4 className="modal-title">{this.props.accessLevel > 0 ? "Edit Result" : "View Result"}</h4>
                         </div>
                         <div className="modal-body">
                             <dl className="dl-horizontal">
@@ -139,18 +167,20 @@ class EditForm extends React.Component {
                                 <dt>Passed or Failed:</dt>
                                 <dd>{this.props.record.PassFail ? "Passed" : "Failed"}</dd>
                                 <dt>Received:</dt>
-                                <dd>{this.props.record.Received}</dd>
+                                <dd>{(new Date(this.props.record.Received)).toLocaleString()}</dd>
                                 <dt>From AD Account:</dt>
                                 <dd>{this.props.record.FromADAcc}</dd>
                                 <dt>Processed:</dt>
-                                <dd>{this.props.record.Processed ? "Processed" : "Not Processed"}</dd>
+                                <dd>{this.props.accessLevel > 0 ? <div className="checkbox"><label><input type="checkbox" checked={this.state.processed} id="processed" onChange={this.handleCheckBoxChange.bind(this)} />{this.state.processed?"Processed":"Not Processed"}</label></div>
+                                                                : (this.props.record.Processed ? "Processed" : "Not Processed")}</dd>
                                 <dt>Comments:</dt>
-                                <dd>{this.props.record.Comments}</dd>
+                                <dd>{this.props.accessLevel > 0 ? <textarea className="form-control large-field" rows={3} value={this.state.comments} id="comments" onChange={this.handleChange.bind(this)} /> :this.props.record.Comments}</dd>
                             </dl>
                         </div>
                         <div className="modal-footer">
+                            <button type="button" className="btn btn-danger" disabled={this.props.accessLevel > 1 ? "" : "disabled"} onClick={this.handleDelete.bind(this)}>Delete</button>
+                            <button type="button" className="btn btn-primary" disabled={this.props.accessLevel > 0 ? "" : "disabled"} onClick={this.handleSave.bind(this)}>Save changes</button>
                             <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary" disabled="disabled">Save changes</button>
                         </div>
                     </div>
                   </div>
@@ -255,7 +285,7 @@ class ELearnForm extends React.Component {
 class ELearningResultsApp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { message: "Fetching Results...", data: [], selected: {}, showSearch: false, totalPages:0, currentPage: 1 };
+        this.state = { message: "Fetching Results...", data: [], selected: {}, showSearch: false, totalPages:0, currentPage: 1, accessLevel: 0 };
         this.handleGoToPage = this.handleGoToPage.bind(this);
     }
 
@@ -278,13 +308,26 @@ class ELearningResultsApp extends React.Component {
                 console.log(result);
             }
         });
-        
 
+        var updateAccess = this.updateAccess.bind(this);
+        $.ajax({
+            type: "GET",
+            url: "api/values",
+            success: updateAccess,
+            error: function (result) {
+                alert('Error fetching results!');
+                console.log(result);
+            }
+        });
     }
 
     ajaxSuccess(result) {
         var totPage = Math.floor((result.length - 1)/ this.props.pageSize) + 1;
         this.setState({ message: "E-Learning Results", data: result, totalPages: totPage, currentPage: 1, startAt: 1 });
+    }
+
+    updateAccess(result) {
+        this.setState({ accessLevel: result });
     }
 
     handleResultSelection(id) {
@@ -343,6 +386,30 @@ class ELearningResultsApp extends React.Component {
         this.setState({ data: currentData, totalPages: totPage });
     }
 
+    handleEditResult(s) {
+        
+        $.ajax({
+            type: "PUT",
+            url: "api/ELResults/" + s.id,
+            data: s,
+            error: function (result) {
+                alert('Error saving changes!');
+                console.log(result);
+            }
+        });
+    }
+
+    handleDeleteResult(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "api/ELResults/" + id,
+            error: function (result) {
+                alert('Error deleting record!');
+                console.log(result);
+            }
+        });
+    }
+
     render() {
         return (
             <div>
@@ -350,7 +417,7 @@ class ELearningResultsApp extends React.Component {
                 <SearchForm vis={this.state.showSearch} search={this.handleSearch.bind(this)}/>
                 <DataTable data={this.state.totalPages > 1 ? this.state.data.slice(((this.state.currentPage - 1)*this.props.pageSize), (this.state.currentPage*this.props.pageSize)) : this.state.data} handleSelection={this.handleResultSelection.bind(this)} />
                 <Paginator vis={this.state.totalPages > 1 ? true : false} pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
-                <EditForm record={this.state.selected}/>
+                <EditForm record={this.state.selected} accessLevel={this.state.accessLevel} editResult={this.handleEditResult.bind(this)} deleteResult={this.handleDeleteResult.bind(this)}/>
                 <hr />
                 <h4>Manually Add Result:</h4>
                 <ELearnForm newResult={this.handleNewResult.bind(this)}/>

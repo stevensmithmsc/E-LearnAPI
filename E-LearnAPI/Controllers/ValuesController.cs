@@ -18,10 +18,10 @@ namespace E_LearnAPI.Controllers
         // GET api/values
         public short Get()
         {
-            Person userPerson = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name);
-            if (userPerson != null)
+            ReportAccess userAccess = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name).ReportAccess;
+            if (userAccess != null)
             {
-                short AccLvl = userPerson.ReportAccess.AccessLevel;
+                short AccLvl = userAccess.AccessLevel;
                 return AccLvl;
             }
             return 0;
