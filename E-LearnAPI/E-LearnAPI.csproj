@@ -297,6 +297,10 @@
     <Compile Include="Migrations\201712111651034_Change Access Level Column Name.Designer.cs">
       <DependentUpon>201712111651034_Change Access Level Column Name.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712130832423_Correct Access Level fieldtype.cs" />
+    <Compile Include="Migrations\201712130832423_Correct Access Level fieldtype.Designer.cs">
+      <DependentUpon>201712130832423_Correct Access Level fieldtype.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\ELResult.cs" />
@@ -398,6 +402,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712111651034_Change Access Level Column Name.resx">
       <DependentUpon>201712111651034_Change Access Level Column Name.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130832423_Correct Access Level fieldtype.resx">
+      <DependentUpon>201712130832423_Correct Access Level fieldtype.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -10,6 +10,6 @@ namespace E_LearnAPI.Models
         public int StaffID { get; set; }
         public virtual Person Staff { get; set; }
 
-        public short AccessLevel { get; set; }
+        public byte AccessLevel { get; set; }
     }
 }

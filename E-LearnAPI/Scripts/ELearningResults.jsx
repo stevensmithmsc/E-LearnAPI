@@ -397,6 +397,12 @@ class ELearningResultsApp extends React.Component {
                 console.log(result);
             }
         });
+
+        var prevData = this.state.data;
+        var updatedIndex = prevData.map(item => item.Id).indexOf(s.id);
+        prevData[updatedIndex].Processed = s.processed;
+        prevData[updatedIndex].Comments = s.comments;
+        this.setState({ data: prevData });
     }
 
     handleDeleteResult(id) {
@@ -408,6 +414,12 @@ class ELearningResultsApp extends React.Component {
                 console.log(result);
             }
         });
+
+        var prevData = this.state.data;
+        var deleteIndex = prevData.map(item => item.Id).indexOf(id);
+        if (deleteIndex !== -1) prevData.splice(deleteIndex, 1);
+        var totPage = Math.floor((prevData.length - 1) / this.props.pageSize) + 1;
+        this.setState({ data: prevData, totalPages: totPage });
     }
 
     render() {

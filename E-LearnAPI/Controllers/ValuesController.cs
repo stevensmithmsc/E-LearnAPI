@@ -16,12 +16,12 @@ namespace E_LearnAPI.Controllers
         private TrainingDatabase db = new TrainingDatabase();
 
         // GET api/values
-        public short Get()
+        public byte Get()
         {
             ReportAccess userAccess = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name).ReportAccess;
             if (userAccess != null)
             {
-                short AccLvl = userAccess.AccessLevel;
+                byte AccLvl = userAccess.AccessLevel;
                 return AccLvl;
             }
             return 0;
