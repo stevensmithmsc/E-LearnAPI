@@ -6,6 +6,9 @@ using System.Web;
 
 namespace E_LearnAPI.Models.EntityConfigurations
 {
+    /// <summary>
+    /// Describes how the ELResults class will be stored in the database.
+    /// </summary>
     public class ELResultsConfiguration : EntityTypeConfiguration<ELResult>
     {
         public ELResultsConfiguration()

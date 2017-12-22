@@ -1,4 +1,7 @@
-﻿class SearchForm extends React.Component {
+﻿// This script uses react to produce an interface allowing users to view, update and delete E-Learning Results
+
+// Search form stores search parameters in state object and passes them to search function when button is pressed.
+class SearchForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = { nameSearch: "", nonProc: true };
@@ -41,6 +44,7 @@
     }
 }
 
+//This class represents a number(page) with the Paginator component that is not the active page.
 class PaginatorNumber extends React.Component {
     render() {
         return (
@@ -49,6 +53,7 @@ class PaginatorNumber extends React.Component {
     }
 }
 
+//renders the paginator component
 class Paginator extends React.Component {
     render() {
         var pages = [];
@@ -77,6 +82,7 @@ class Paginator extends React.Component {
     }
 }
 
+//The component renders the main datatable.
 class DataTable extends React.Component {
     
 
@@ -110,6 +116,7 @@ class DataTable extends React.Component {
     }
 }
 
+//This component renders the modal edit form which allows for editing and deleting of E-Learning results if user access level is sufficent.
 class EditForm extends React.Component {
     constructor(props) {
         super(props);
@@ -189,6 +196,7 @@ class EditForm extends React.Component {
     }
 }
 
+//This component handles the new E-Learning Result form and will send the new record to the api via ajax.
 class ELearnForm extends React.Component {
     constructor(props) {
         super(props);
@@ -281,7 +289,8 @@ class ELearnForm extends React.Component {
     }
 }
 
-
+//This is the main component for this application.  It get a list of E-Learning Results (using ajax)
+// and handles interactions between the other components and the data.
 class ELearningResultsApp extends React.Component {
     constructor(props) {
         super(props);
@@ -315,7 +324,7 @@ class ELearningResultsApp extends React.Component {
             url: "api/values",
             success: updateAccess,
             error: function (result) {
-                alert('Error fetching results!');
+                alert('Error getting access level!');
                 console.log(result);
             }
         });

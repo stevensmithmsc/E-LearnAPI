@@ -8,6 +8,10 @@ namespace E_LearnAPI.Controllers
 {
     public class HomeController : Controller
     {
+        /// <summary>
+        /// Serves the home page of the web site.
+        /// </summary>
+        /// <returns></returns>
         [Authorize]
         public ActionResult Index()
         {

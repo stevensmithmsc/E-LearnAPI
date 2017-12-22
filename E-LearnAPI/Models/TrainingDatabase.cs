@@ -5,6 +5,10 @@ namespace E_LearnAPI.Models
     using System.Data.Entity;
     using System.Linq;
 
+    /// <summary>
+    /// This represents the Training Database.
+    ///     Only tables and fields required by the API and it's logic are accessable from this class.
+    /// </summary>
     public class TrainingDatabase : DbContext
     {
         // Your context has been configured to use a 'TrainingDatabase' connection string from your application's 
@@ -22,11 +26,29 @@ namespace E_LearnAPI.Models
         // on configuring and using a Code First model, see http://go.microsoft.com/fwlink/?LinkId=390109.
 
         // public virtual DbSet<MyEntity> MyEntities { get; set; }
+        /// <summary>
+        /// The E-Learning Results Table
+        /// </summary>
         public virtual DbSet<ELResult> ELResults { get; set; }
+        /// <summary>
+        /// The Staff table
+        /// </summary>
         public virtual DbSet<Person> People { get; set; }
+        /// <summary>
+        /// The Courses table
+        /// </summary>
         public virtual DbSet<Course> Courses { get; set; }
+        /// <summary>
+        /// The Statuses table
+        /// </summary>
         public virtual DbSet<Status> Statuses { get; set; }
+        /// <summary>
+        /// The Requirements (req) Table
+        /// </summary>
         public virtual DbSet<Requirement> Requirements { get; set; }
+        /// <summary>
+        /// The Report Access Table
+        /// </summary>
         public virtual DbSet<ReportAccess> Access { get; set; }
 
 

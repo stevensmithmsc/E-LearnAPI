@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("E_LearnAPI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("API to respond to messages about E-Learning Courses - messages send by ajax calls embeded in Captivate Projects.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Pennine Care NHS Foundation Trust")]
 [assembly: AssemblyProduct("E_LearnAPI")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]

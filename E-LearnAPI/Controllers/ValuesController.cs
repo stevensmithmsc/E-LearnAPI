@@ -9,12 +9,19 @@ using System.Web.Http.Description;
 
 namespace E_LearnAPI.Controllers
 {
+    /// <summary>
+    /// Gets data from database specific to current user.
+    /// </summary>
     [Authorize]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ValuesController : ApiController
     {
         private TrainingDatabase db = new TrainingDatabase();
 
+        /// <summary>
+        /// Gets the E-Learning Access Level for the current user.
+        /// </summary>
+        /// <returns></returns>
         // GET api/values
         public byte Get()
         {

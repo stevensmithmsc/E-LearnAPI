@@ -15,10 +15,19 @@ using E_LearnAPI.DTOs;
 
 namespace E_LearnAPI.Controllers
 {
+    /// <summary>
+    /// Handles messages regarding E-Laerning Results
+    /// </summary>
     public class ELResultsController : ApiController
     {
         private TrainingDatabase db = new TrainingDatabase();
 
+        /// <summary>
+        /// Gets a list of E-Learning Results from the database.
+        /// </summary>
+        /// <param name="search">Optional String Parameter, will search Person Name for any name containing parameter, if included.</param>
+        /// <param name="processed">Optional Boolean Parameter, will search the Processed field for matching results, if included.</param>
+        /// <returns>List of upto 200 E-Laerning Results.</returns>
         [Authorize]
         // GET: api/ELResults
         public IQueryable<ELResult> GetELResults(string search = null, bool? processed = null)
@@ -35,9 +44,14 @@ namespace E_LearnAPI.Controllers
                 result = result.Where(r => r.Processed == processed);
             }
 
-            return result.Take(100);
+            return result.Take(200);
         }
 
+        /// <summary>
+        /// Gets a single E-Learning result from the database.
+        /// </summary>
+        /// <param name="id">The ID from the database of the E-Learning Result.</param>
+        /// <returns>The matching E-Learning result or Not Found (404)</returns>
         [Authorize]
         // GET: api/ELResults/5
         [ResponseType(typeof(ELResult))]
@@ -52,6 +66,13 @@ namespace E_LearnAPI.Controllers
             return Ok(eLResult);
         }
 
+        /// <summary>
+        /// Updates the processed and comments fields of an E-Learning result record, then
+        /// attempts to process the result if processed field is false.
+        /// </summary>
+        /// <param name="id">This is the ID field of the E-Learning Result from the database.</param>
+        /// <param name="resultDTO">Contains the Comments and Processed field of the E-Learning Result</param>
+        /// <returns>A http code (204 if successful)</returns>
         [Authorize]
         // PUT: api/ELResults/5
         [ResponseType(typeof(void))]
@@ -101,6 +122,13 @@ namespace E_LearnAPI.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        /// <summary>
+        /// Receives an E-Learning Result, will populate Received, FromADAcc and Processed fields
+        /// and then attempt to process the E-Learning result before saving it to the database.
+        /// Uses CORS, will accept messages from anywhere.
+        /// </summary>
+        /// <param name="eLResult">This is the E-Learning Result</param>
+        /// <returns>The e-laerning result with additional fields populated.</returns>
         // POST: api/ELResults
         [ResponseType(typeof(ELResult))]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -123,6 +151,11 @@ namespace E_LearnAPI.Controllers
             return CreatedAtRoute("DefaultApi", new { id = eLResult.Id }, eLResult);
         }
 
+        /// <summary>
+        /// Deletes a E-Learning result from the database.
+        /// </summary>
+        /// <param name="id">The ID of the E-Learning result to be deleted.</param>
+        /// <returns>The deleted E-Learning result/</returns>
         [Authorize]
         // DELETE: api/ELResults/5
         [ResponseType(typeof(ELResult))]
@@ -149,6 +182,13 @@ namespace E_LearnAPI.Controllers
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Attempts to process the E-learning result and update the associated requirement if found.
+        /// Updated to processed field to true if sucessful, otherwise will update the comment field
+        /// to reflect the reason the processing failed.
+        /// </summary>
+        /// <param name="eLResult">The E-Learning Result</param>
+        /// <returns>nothing</returns>
         private async Task ProcessResultAsync(ELResult eLResult)
         {
             //Find Person
@@ -179,7 +219,21 @@ namespace E_LearnAPI.Controllers
             if (eLResult.PassFail != null)
             {
                 req.Status = (bool)(eLResult.PassFail) ? (short)5 : (short)2;
-            } else
+
+                //Puts additional information in requirement comment.
+                //if ((bool)(eLResult.PassFail))
+                //{
+                //    req.Status = (short)5;
+                //    req.Comments = "Passed: " + eLResult.Received.ToShortDateString();
+                //}
+                //else
+                //{
+                //    int attempts = await db.ELResults.Where(r => r.PersonId == person.ESRID && r.CourseId == course.ID && r.PassFail == false).CountAsync();
+                //    req.Status = (short)2;
+                //    req.Comments = "Number of Attempts: " + attempts.ToString();
+                //}
+            }
+            else
             {
                 eLResult.Comments = "No Pass or Fail included in message";
                 await db.SaveChangesAsync();
