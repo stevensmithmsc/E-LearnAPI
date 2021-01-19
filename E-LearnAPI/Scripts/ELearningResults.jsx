@@ -93,20 +93,16 @@ class DataTable extends React.Component {
                     <tr>
                         <th>Staff Name</th>
                         <th>Course</th>
-                        <th>Score</th>
-                        <th>Max Score</th>
-                        <th>Result</th>
+                        <th>Completion Date</th>
                         <th>Result Processed</th>
                     </tr>
                 </thead>
                 <tbody>
                 {this.props.data.map(d => (
                         <tr key={d.Id} onClick={() => this.props.handleSelection(d.Id)}>
-                            <td>{d.PersonName}</td>
-                            <td>{d.CourseDesc}</td>
-                            <td>{d.Score}</td>
-                            <td>{d.MaxScore}</td>
-                            <td>{d.PassFail ? "Passed" : "Failed"}</td>
+                            <td>{d.PersonName ? d.PersonName : `Employee: ${d.PersonId}`}</td>
+                            <td>{d.CourseDesc ? d.CourseDesc : d.ModuleName}</td>
+                            <td>{(new Date(d.CompletionDate)).toLocaleDateString('en-GB')}</td>
                             <td>{d.Processed ? "Processed" : "Not Processed"}</td>
                         </tr>
                     ))}
@@ -167,14 +163,14 @@ class EditForm extends React.Component {
                                 <dd>{this.props.record.CourseId}</dd>
                                 <dt>Course Description:</dt>
                                 <dd>{this.props.record.CourseDesc}</dd>
-                                <dt>Score:</dt>
-                                <dd>{this.props.record.Score}</dd>
-                                <dt>Max Score:</dt>
-                                <dd>{this.props.record.MaxScore}</dd>
+                                <dt>ESR Module:</dt>
+                                <dd>{this.props.record.ModuleName}</dd>
+                                <dt>Completion Date:</dt>
+                                <dd>{(new Date(this.props.record.CompletionDate)).toLocaleDateString('en-GB')}</dd>
                                 <dt>Passed or Failed:</dt>
                                 <dd>{this.props.record.PassFail ? "Passed" : "Failed"}</dd>
                                 <dt>Received:</dt>
-                                <dd>{(new Date(this.props.record.Received)).toLocaleString()}</dd>
+                                <dd>{(new Date(this.props.record.Received)).toLocaleString('en-GB')}</dd>
                                 <dt>From AD Account:</dt>
                                 <dd>{this.props.record.FromADAcc}</dd>
                                 <dt>Processed:</dt>

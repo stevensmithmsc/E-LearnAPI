@@ -25,10 +25,10 @@ namespace E_LearnAPI.Controllers
         // GET api/values
         public byte Get()
         {
-            ReportAccess userAccess = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name).ReportAccess;
+            var userAccess = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name);
             if (userAccess != null)
             {
-                byte AccLvl = userAccess.AccessLevel;
+                byte AccLvl = userAccess.ReportAccess.AccessLevel;
                 return AccLvl;
             }
             return 0;

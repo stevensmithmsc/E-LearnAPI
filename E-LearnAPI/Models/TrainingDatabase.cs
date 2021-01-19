@@ -51,6 +51,7 @@ namespace E_LearnAPI.Models
         /// </summary>
         public virtual DbSet<ReportAccess> Access { get; set; }
 
+        public virtual DbSet<ESRModules> ESRs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -60,6 +61,7 @@ namespace E_LearnAPI.Models
             modelBuilder.Configurations.Add(new StatusConfiguration());
             modelBuilder.Configurations.Add(new RequirementConfiguration());
             modelBuilder.Configurations.Add(new ReportAccessConfiguration());
+            modelBuilder.Configurations.Add(new ESRModulesConfiguration());
         }
     }
 

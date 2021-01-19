@@ -30,21 +30,24 @@ namespace E_LearnAPI.Controllers
         /// <returns>List of upto 200 E-Laerning Results.</returns>
         [Authorize]
         // GET: api/ELResults
-        public IQueryable<ELResult> GetELResults(string search = null, bool? processed = null)
+        [ResponseType(typeof(IEnumerable<ResultDTO>))]
+        public async Task<IHttpActionResult> GetELResults(string search = null, bool? processed = null)
         {
-            var result = (IQueryable<ELResult>)db.ELResults;
+            var result = db.ESRs.AsQueryable();
 
-            if (search != null)
-            {
-                result = result.Where(r => r.PersonName.Contains(search));
-            }
+            //if (search != null)
+            //{
+            //    result = result.Where(r => r.PersonName.Contains(search));
+            //}
 
             if (processed != null)
             {
                 result = result.Where(r => r.Processed == processed);
             }
 
-            return result.Take(200);
+            var resultList = await result.OrderByDescending(r => r.CompletionDate).Take(200).ToListAsync();
+
+            return Ok(resultList.Select(e => new ResultDTO(e)));
         }
 
         /// <summary>
@@ -54,16 +57,16 @@ namespace E_LearnAPI.Controllers
         /// <returns>The matching E-Learning result or Not Found (404)</returns>
         [Authorize]
         // GET: api/ELResults/5
-        [ResponseType(typeof(ELResult))]
+        [ResponseType(typeof(ResultDTO))]
         public async Task<IHttpActionResult> GetELResult(int id)
         {
-            ELResult eLResult = await db.ELResults.FindAsync(id);
+            var eLResult = await db.ESRs.FindAsync(id);
             if (eLResult == null)
             {
                 return NotFound();
             }
 
-            return Ok(eLResult);
+            return Ok(new ResultDTO(eLResult));
         }
 
         /// <summary>
@@ -89,7 +92,7 @@ namespace E_LearnAPI.Controllers
             }
 
             //db.Entry(eLResult).State = EntityState.Modified;
-            ELResult eLResult = await db.ELResults.FindAsync(id);
+            var eLResult = await db.ESRs.FindAsync(id);
             if (eLResult == null)
             {
                 return NotFound();
@@ -130,12 +133,12 @@ namespace E_LearnAPI.Controllers
         /// <param name="eLResult">This is the E-Learning Result</param>
         /// <returns>The e-laerning result with additional fields populated.</returns>
         // POST: api/ELResults
-        [ResponseType(typeof(ELResult))]
+        [ResponseType(typeof(ESRModules))]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public async Task<IHttpActionResult> PostELResult(ELResult eLResult)
+        public async Task<IHttpActionResult> PostELResult(ESRModules eLResult)
         {
-            eLResult.Received = DateTime.Now;
-            eLResult.FromADAcc = User.Identity.Name;
+            //eLResult.Received = DateTime.Now;
+            //eLResult.FromADAcc = User.Identity.Name;
             eLResult.Processed = false;
 
             if (!ModelState.IsValid)
@@ -143,12 +146,12 @@ namespace E_LearnAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            db.ELResults.Add(eLResult);
+            db.ESRs.Add(eLResult);
             await db.SaveChangesAsync();
 
             await ProcessResultAsync(eLResult);
 
-            return CreatedAtRoute("DefaultApi", new { id = eLResult.Id }, eLResult);
+            return CreatedAtRoute("DefaultApi", new { id = eLResult.ID }, eLResult);
         }
 
         /// <summary>
@@ -158,16 +161,16 @@ namespace E_LearnAPI.Controllers
         /// <returns>The deleted E-Learning result/</returns>
         [Authorize]
         // DELETE: api/ELResults/5
-        [ResponseType(typeof(ELResult))]
+        [ResponseType(typeof(ESRModules))]
         public async Task<IHttpActionResult> DeleteELResult(int id)
         {
-            ELResult eLResult = await db.ELResults.FindAsync(id);
+            var eLResult = await db.ESRs.FindAsync(id);
             if (eLResult == null)
             {
                 return NotFound();
             }
 
-            db.ELResults.Remove(eLResult);
+            db.ESRs.Remove(eLResult);
             await db.SaveChangesAsync();
 
             return Ok(eLResult);
@@ -189,36 +192,51 @@ namespace E_LearnAPI.Controllers
         /// </summary>
         /// <param name="eLResult">The E-Learning Result</param>
         /// <returns>nothing</returns>
-        private async Task ProcessResultAsync(ELResult eLResult)
+        private async Task ProcessResultAsync(ESRModules eLResult)
         {
-            //Find Person
-            var person = await db.People.SingleOrDefaultAsync(p => p.ESRID == eLResult.PersonId);
-            if (person == null)
+            if (eLResult.StaffID == null)
             {
-                eLResult.Comments = "Unable to find staff member with matching ID";
-                await db.SaveChangesAsync();
-                return;
+                if (eLResult.Employee > 0)
+                {
+                    //Find Person
+                    var person = await db.People.SingleOrDefaultAsync(p => p.ESRID == eLResult.Employee);
+                    if (person == null)
+                    {
+                        eLResult.Comments = "Unable to find staff member with matching employee number";
+                        await db.SaveChangesAsync();
+                        return;
+                    }
+                    eLResult.StaffID = person.ID;
+                }
             }
-            //Find Course
-            var course = await db.Courses.SingleOrDefaultAsync(c => c.ID == eLResult.CourseId);
-            if (course == null)
+            
+            if (eLResult.CourseID == null)
             {
-                eLResult.Comments = "Unable to find course with matching ID";
-                await db.SaveChangesAsync();
-                return;
+                //Find Course
+                var course = await db.Courses.SingleOrDefaultAsync(c => c.CourseName == eLResult.ModuleName);
+                if (course == null)
+                {
+                    eLResult.Comments = $"Unable to find course matching {eLResult.ModuleName}";
+                    await db.SaveChangesAsync();
+                    return;
+                }
+                eLResult.CourseID = course.ID;
             }
+            
+            
             //Find Requirement
-            var req = await db.Requirements.SingleOrDefaultAsync(r => r.Staff == person.ID && r.Course == eLResult.CourseId);
+            var req = await db.Requirements.SingleOrDefaultAsync(r => r.Staff == eLResult.StaffID && r.Course == eLResult.CourseID);
             if (req == null)
             {
                 eLResult.Comments = "Staff member does not have requirement for course.";
                 await db.SaveChangesAsync();
                 return;
             }
+
             //Update Requirement
-            if (eLResult.PassFail != null)
+            if (eLResult.CompletionDate != null)
             {
-                req.Status = (bool)(eLResult.PassFail) ? (short)5 : (short)2;
+                req.Status = (short)5;
 
                 //Puts additional information in requirement comment.
                 //if ((bool)(eLResult.PassFail))
@@ -235,7 +253,7 @@ namespace E_LearnAPI.Controllers
             }
             else
             {
-                eLResult.Comments = "No Pass or Fail included in message";
+                eLResult.Comments = "No Completion Date included in message";
                 await db.SaveChangesAsync();
                 return;
             }
