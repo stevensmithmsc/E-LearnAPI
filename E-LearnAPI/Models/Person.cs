@@ -26,6 +26,8 @@ namespace E_LearnAPI.Models
         /// </summary>
         public string Sname { get; set; }
 
+        public string EMail { get; set; }
+
         /// <summary>
         /// ESR Employee Number
         /// </summary>

@@ -306,10 +306,20 @@
     <Compile Include="Migrations\202101181559196_Add_ESR_Modules_Table.Designer.cs">
       <DependentUpon>202101181559196_Add_ESR_Modules_Table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202101191548504_add_module_course_mapping_table.cs" />
+    <Compile Include="Migrations\202101191548504_add_module_course_mapping_table.Designer.cs">
+      <DependentUpon>202101191548504_add_module_course_mapping_table.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.cs" />
+    <Compile Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.Designer.cs">
+      <DependentUpon>202101191643442_add_additional_fields_to_ESR_Modules_table.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Course.cs" />
+    <Compile Include="Models\CourseMap.cs" />
     <Compile Include="Models\ELResult.cs" />
     <Compile Include="Models\EntityConfigurations\CourseConfiguration.cs" />
+    <Compile Include="Models\EntityConfigurations\CourseMapConfiguration.cs" />
     <Compile Include="Models\EntityConfigurations\ELResultsConfiguration.cs" />
     <Compile Include="Models\EntityConfigurations\ESRModulesConfiguration.cs" />
     <Compile Include="Models\EntityConfigurations\PersonConfiguration.cs" />
@@ -415,6 +425,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202101181559196_Add_ESR_Modules_Table.resx">
       <DependentUpon>202101181559196_Add_ESR_Modules_Table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101191548504_add_module_course_mapping_table.resx">
+      <DependentUpon>202101191548504_add_module_course_mapping_table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.resx">
+      <DependentUpon>202101191643442_add_additional_fields_to_ESR_Modules_table.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

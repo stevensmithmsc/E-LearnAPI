@@ -264,7 +264,7 @@ namespace E_LearnAPI.Controllers
 
         private bool ELResultExists(int id)
         {
-            return db.ELResults.Count(e => e.Id == id) > 0;
+            return db.ESRs.Count(e => e.ID == id) > 0;
         }
     }
 }

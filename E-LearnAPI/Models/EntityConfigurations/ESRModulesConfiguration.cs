@@ -14,6 +14,10 @@ namespace E_LearnAPI.Models.EntityConfigurations
 
             HasKey(e => e.ID);
 
+            Property(e => e.UserName)
+                .HasColumnType("varchar")
+                .HasMaxLength(80);
+
             HasOptional(e => e.Staff)
                 .WithMany()
                 .HasForeignKey(e => e.StaffID);
@@ -27,11 +31,22 @@ namespace E_LearnAPI.Models.EntityConfigurations
                 .WithMany()
                 .HasForeignKey(e => e.CourseID);
 
+            Property(e => e.CompletionDate)
+                .HasColumnType("Date");
+
             Property(e => e.Processed)
                 .IsRequired();
 
             Property(e => e.Comments)
                 .HasColumnType("text");
+
+            Property(e => e.Received)
+                .HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed);
+
+            Property(e => e.Source)
+                .IsRequired()
+                .HasColumnType("varchar")
+                .HasMaxLength(100);
         }
     }
 }

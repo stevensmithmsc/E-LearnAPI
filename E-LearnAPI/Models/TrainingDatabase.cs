@@ -53,6 +53,8 @@ namespace E_LearnAPI.Models
 
         public virtual DbSet<ESRModules> ESRs { get; set; }
 
+        public virtual DbSet<CourseMap> CourseMaps { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new ELResultsConfiguration());
@@ -62,6 +64,7 @@ namespace E_LearnAPI.Models
             modelBuilder.Configurations.Add(new RequirementConfiguration());
             modelBuilder.Configurations.Add(new ReportAccessConfiguration());
             modelBuilder.Configurations.Add(new ESRModulesConfiguration());
+            modelBuilder.Configurations.Add(new CourseMapConfiguration());
         }
     }
 

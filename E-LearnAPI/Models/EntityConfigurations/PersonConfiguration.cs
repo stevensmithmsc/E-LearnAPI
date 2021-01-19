@@ -21,6 +21,10 @@ namespace E_LearnAPI.Models.EntityConfigurations
                 .HasColumnType("varchar")
                 .HasMaxLength(35);
 
+            Property(p => p.EMail)
+                .HasColumnType("varchar")
+                .HasMaxLength(80);
+
             Property(p => p.ADAccount)
                 .HasColumnType("varchar")
                 .HasMaxLength(50);

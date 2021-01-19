@@ -21,7 +21,7 @@ namespace E_LearnAPI.DTOs
         /// <summary>
         /// This the the ID field from the Courses table.
         /// </summary>
-        public int CourseId { get; set; }
+        public int? CourseId { get; set; }
 
         public string CourseDesc { get; set; }
 
@@ -60,7 +60,7 @@ namespace E_LearnAPI.DTOs
             {
                 this.PersonName = eSR.Staff.Fname + " " + eSR.Staff.Sname;
             }
-            this.CourseId = eSR.CourseID.Value;   
+            this.CourseId = eSR.CourseID;   
             if (eSR.CourseID != null)
             {
                 this.CourseDesc = eSR.Course.CourseName;

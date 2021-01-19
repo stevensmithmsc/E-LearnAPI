@@ -9,6 +9,7 @@ namespace E_LearnAPI.Models
     {
         public int ID { get; set; }
         public int Employee { get; set; }
+        public string UserName { get; set; }
         public int? StaffID { get; set; }
         public virtual Person Staff { get; set; }
         public string ModuleName { get; set; }
@@ -17,5 +18,8 @@ namespace E_LearnAPI.Models
         public DateTime CompletionDate { get; set; }
         public bool Processed { get; set; }
         public string Comments { get; set; }
+        public DateTime Received { get; set; }
+        public string Source { get; set; }
+
     }
 }

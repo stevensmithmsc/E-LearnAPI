@@ -36,9 +36,12 @@ namespace E_LearnAPI.Models
         /// </summary>
         public virtual ICollection<Requirement> Requirements { get; set; }
 
+        public virtual ICollection<CourseMap> Modules { get; set; }
+
         public Course()
         {
             this.Requirements = new HashSet<Requirement>();
+            this.Modules = new HashSet<CourseMap>();
         }
     }
 }
