@@ -273,6 +273,7 @@
     <Compile Include="Controllers\ELResultsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="DTOs\NewResultDTO.cs" />
     <Compile Include="DTOs\ResultDTO.cs" />
     <Compile Include="DTOs\ResultUpdateDto.cs" />
     <Compile Include="Global.asax.cs">
@@ -313,6 +314,10 @@
     <Compile Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.cs" />
     <Compile Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.Designer.cs">
       <DependentUpon>202101191643442_add_additional_fields_to_ESR_Modules_table.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101191655001_apparently_needs_another_migration.cs" />
+    <Compile Include="Migrations\202101191655001_apparently_needs_another_migration.Designer.cs">
+      <DependentUpon>202101191655001_apparently_needs_another_migration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Course.cs" />
@@ -431,6 +436,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202101191643442_add_additional_fields_to_ESR_Modules_table.resx">
       <DependentUpon>202101191643442_add_additional_fields_to_ESR_Modules_table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101191655001_apparently_needs_another_migration.resx">
+      <DependentUpon>202101191655001_apparently_needs_another_migration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

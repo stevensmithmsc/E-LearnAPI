@@ -82,6 +82,19 @@ class Paginator extends React.Component {
     }
 }
 
+class PersonDisplay extends React.Component {
+    render() {
+        if (this.props.Name) 
+            return (<span>{ this.props.Name }</span>)
+        else if (this.props.Id > 0)
+            return (<span>Employee: <i>{this.props.Id}</i></span>)
+        else if (this.props.UserName)
+            return (<i>{this.props.UserName}</i>)
+        else 
+            return (<i>Unknown</i>)
+    }
+}
+
 //The component renders the main datatable.
 class DataTable extends React.Component {
     
@@ -95,15 +108,17 @@ class DataTable extends React.Component {
                         <th>Course</th>
                         <th>Completion Date</th>
                         <th>Result Processed</th>
+                        <th>Source</th>
                     </tr>
                 </thead>
                 <tbody>
                 {this.props.data.map(d => (
                         <tr key={d.Id} onClick={() => this.props.handleSelection(d.Id)}>
-                            <td>{d.PersonName ? d.PersonName : `Employee: ${d.PersonId}`}</td>
+                            <td><PersonDisplay Name={d.PersonName} Id={d.PersonId} UserName={d.UserName} /></td>
                             <td>{d.CourseDesc ? d.CourseDesc : d.ModuleName}</td>
                             <td>{(new Date(d.CompletionDate)).toLocaleDateString('en-GB')}</td>
                             <td>{d.Processed ? "Processed" : "Not Processed"}</td>
+                            <td>{d.FromADAcc}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -156,22 +171,20 @@ class EditForm extends React.Component {
                                 <dt>ID:</dt>
                                 <dd>{this.props.record.Id}</dd>
                                 <dt>Person ESR ID:</dt>
-                                <dd>{this.props.record.PersonId}</dd>
+                                <dd>{this.props.record.PersonId===-1?"Not Recorded":this.props.record.PersonId}</dd>
+                                <dt>Person LMS Username:</dt>
+                                <dd>{this.props.record.UserName}</dd>
                                 <dt>Person name:</dt>
                                 <dd>{this.props.record.PersonName}</dd>
-                                <dt>Course ID:</dt>
-                                <dd>{this.props.record.CourseId}</dd>
+                                <dt>E-Learning Module:</dt>
+                                <dd>{this.props.record.ModuleName}</dd>
                                 <dt>Course Description:</dt>
                                 <dd>{this.props.record.CourseDesc}</dd>
-                                <dt>ESR Module:</dt>
-                                <dd>{this.props.record.ModuleName}</dd>
                                 <dt>Completion Date:</dt>
-                                <dd>{(new Date(this.props.record.CompletionDate)).toLocaleDateString('en-GB')}</dd>
-                                <dt>Passed or Failed:</dt>
-                                <dd>{this.props.record.PassFail ? "Passed" : "Failed"}</dd>
+                                <dd>{(new Date(this.props.record.CompletionDate)).toLocaleDateString('en-GB')}</dd>                              
                                 <dt>Received:</dt>
                                 <dd>{(new Date(this.props.record.Received)).toLocaleString('en-GB')}</dd>
-                                <dt>From AD Account:</dt>
+                                <dt>Source:</dt>
                                 <dd>{this.props.record.FromADAcc}</dd>
                                 <dt>Processed:</dt>
                                 <dd>{this.props.accessLevel > 0 ? <div className="checkbox"><label><input type="checkbox" checked={this.state.processed} id="processed" onChange={this.handleCheckBoxChange.bind(this)} />{this.state.processed?"Processed":"Not Processed"}</label></div>
@@ -209,13 +222,10 @@ class ELearnForm extends React.Component {
         e.preventDefault();
         var ajaxSuccess = this.ajaxSuccess.bind(this);
         this.setState({
-            PersonId: this.refs.personId.value,
-            PersonName: this.refs.personName.value,
-            CourseId: this.refs.courseId.value,
-            CourseDesc: this.refs.courseDesc.value,
-            Score: this.refs.score.value,
-            MaxScore: this.refs.maxScore.value,
-            PassFail: this.refs.passFail.value
+            Employee: this.refs.personId.value,
+            UserName: this.refs.uName.value,
+            ModuleName: this.refs.courseDesc.value,
+            CompletionDate: this.refs.cDate.value
         }, () => {
             $.ajax({
                 type: "POST",
@@ -237,48 +247,28 @@ class ELearnForm extends React.Component {
                 <div className="form-group">
                     <label htmlFor="personId" className="col-sm-2 control-label" >Person ID</label>
                     <div className="col-sm-10">
-                        <input name="personId" id="personId" ref="personId" className="form-control" placeholder="Please enter Staff ESR ID" />
+                        <input type="number" name="personId" id="personId" ref="personId" className="form-control" placeholder="Please enter Staff ESR ID" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="personName" className="col-sm-2 control-label" >Person Name</label>
+                    <label htmlFor="uName" className="col-sm-2 control-label" >Person LMS UserName</label>
                     <div className="col-sm-10">
-                        <input name="personName" id="personName" ref="personName" className="form-control large-field" placeholder="Please enter Staff Members Name" />
+                        <input type="email" name="uName" id="uName" ref="uName" className="form-control large-field" placeholder="Please enter Staff Members LMS UserName" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="courseId" className="col-sm-2 control-label">Course ID</label>
+                    <label htmlFor="courseDesc" className="col-sm-2 control-label">E-Learning Module</label>
                     <div className="col-sm-10">
-                        <input name="courseId" id="courseId" ref="courseId" className="form-control" placeholder="Please enter course ID" />
+                        <input type="text" name="courseDesc" id="courseDesc" ref="courseDesc" className="form-control large-field" placeholder="Please enter the name of the e-learning module" />
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="courseDesc" className="col-sm-2 control-label">Course Description</label>
+                    <label htmlFor="cDate" className="col-sm-2 control-label">Completion Date</label>
                     <div className="col-sm-10">
-                        <input name="courseDesc" id="courseDesc" ref="courseDesc" className="form-control large-field" placeholder="Please enter course Name" />
+                        <input type="date" name="cDate" id="cDate" ref="cDate" className="form-control" placeholder="Please enter date module was completed" />
                     </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="score" className="col-sm-2 control-label">Score</label>
-                    <div className="col-sm-10">
-                        <input name="score" id="score" ref="score" className="form-control" type="number" placeholder="Please enter score" />
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="maxScore" className="col-sm-2 control-label">Maximum Score</label>
-                    <div className="col-sm-10">
-                        <input name="maxScore" id="maxScore" ref="maxScore" className="form-control" type="number" placeholder="Please enter maximum score" />
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="passFail" className="col-sm-2 control-label">Pass or Fail</label>
-                    <div className="col-sm-10">
-                        <select name="passFail" id="passFail" ref="passFail" className="form-control">
-                            <option value="true">Pass</option>
-                            <option value="false">Fail</option>
-                        </select>
-                    </div>
-                </div>
+                
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
             )
@@ -392,11 +382,16 @@ class ELearningResultsApp extends React.Component {
     }
 
     handleEditResult(s) {
-        
+        var getRecord = this.getRecord.bind(this);
+
         $.ajax({
             type: "PUT",
             url: "api/ELResults/" + s.id,
             data: s,
+            success: function (result) {
+                console.log(result);
+                getRecord(s.id);
+            },
             error: function (result) {
                 alert('Error saving changes!');
                 console.log(result);
@@ -407,6 +402,32 @@ class ELearningResultsApp extends React.Component {
         var updatedIndex = prevData.map(item => item.Id).indexOf(s.id);
         prevData[updatedIndex].Processed = s.processed;
         prevData[updatedIndex].Comments = s.comments;
+        this.setState({ data: prevData });       
+    }
+
+    getRecord(id) {
+        console.log("fetching", id);
+        var recRecord = this.recRecord.bind(this);
+
+        $.ajax({
+            type: "GET",
+            url: "api/ELResults/" + id,
+            success: recRecord,
+            error: function (result) {
+                alert('Error fetching updated record!');
+                console.log(result);
+            }
+        });
+    }
+
+    recRecord(result) {
+        console.log(result);
+        var prevData = this.state.data;
+        var updatedIndex = prevData.map(item => item.Id).indexOf(result.Id);
+        prevData[updatedIndex].PersonName = result.PersonName;
+        prevData[updatedIndex].CourseDesc = result.CourseDesc;
+        prevData[updatedIndex].Processed = result.Processed;
+        prevData[updatedIndex].Comments = result.Comments;
         this.setState({ data: prevData });
     }
 

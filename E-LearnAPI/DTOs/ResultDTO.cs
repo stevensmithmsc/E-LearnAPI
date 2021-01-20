@@ -17,6 +17,8 @@ namespace E_LearnAPI.DTOs
         /// </summary>
         public int PersonId { get; set; }
 
+        public string UserName { get; set; }
+
         public string PersonName { get; set; }
         /// <summary>
         /// This the the ID field from the Courses table.
@@ -56,6 +58,7 @@ namespace E_LearnAPI.DTOs
         {
             this.Id = eSR.ID;
             this.PersonId = eSR.Employee;
+            this.UserName = eSR.UserName;
             if (eSR.StaffID != null)
             {
                 this.PersonName = eSR.Staff.Fname + " " + eSR.Staff.Sname;
@@ -67,7 +70,8 @@ namespace E_LearnAPI.DTOs
             }
             this.ModuleName = eSR.ModuleName;
             this.CompletionDate = eSR.CompletionDate;
-            this.FromADAcc = "ESR Extract";
+            this.FromADAcc = eSR.Source;
+            this.Received = eSR.Received;
             this.Processed = eSR.Processed;
             this.Comments = eSR.Comments;
         }

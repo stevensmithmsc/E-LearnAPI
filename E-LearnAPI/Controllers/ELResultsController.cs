@@ -35,10 +35,25 @@ namespace E_LearnAPI.Controllers
         {
             var result = db.ESRs.AsQueryable();
 
-            //if (search != null)
-            //{
-            //    result = result.Where(r => r.PersonName.Contains(search));
-            //}
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var names = search.Split(' ');
+                if (names.Length == 1)
+                {
+                    result = result.Where(r => r.Staff.Fname.Contains(search) || r.Staff.Sname.Contains(search));
+                }
+                else if (names.Length == 2)
+                {
+                    string searchF = names[0];
+                    string searchS = names[1];
+                    result = result.Where(r => (r.Staff.Fname.Contains(searchF) && r.Staff.Sname.Contains(searchS)));
+                }
+                else
+                {
+                    return BadRequest("Too Many Spaces in search term!");
+                }
+
+            }
 
             if (processed != null)
             {
@@ -133,25 +148,47 @@ namespace E_LearnAPI.Controllers
         /// <param name="eLResult">This is the E-Learning Result</param>
         /// <returns>The e-laerning result with additional fields populated.</returns>
         // POST: api/ELResults
-        [ResponseType(typeof(ESRModules))]
+        [ResponseType(typeof(ResultDTO))]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public async Task<IHttpActionResult> PostELResult(ESRModules eLResult)
+        public async Task<IHttpActionResult> PostELResult(NewResultDTO eLResult)
         {
-            //eLResult.Received = DateTime.Now;
-            //eLResult.FromADAcc = User.Identity.Name;
-            eLResult.Processed = false;
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.ESRs.Add(eLResult);
+            ESRModules result = new ESRModules()
+            {
+                Employee = eLResult.Employee??-1,
+                UserName = eLResult.UserName,
+                ModuleName = eLResult.ModuleName,
+                CompletionDate = eLResult.CompletionDate,
+                Source = eLResult.Source,
+                Processed = false
+            };
+
+            if (string.IsNullOrWhiteSpace(result.Source))
+            {
+                result.Source = User.Identity.Name;
+            }
+
+            db.ESRs.Add(result);
             await db.SaveChangesAsync();
 
-            await ProcessResultAsync(eLResult);
+            await ProcessResultAsync(result);
 
-            return CreatedAtRoute("DefaultApi", new { id = eLResult.ID }, eLResult);
+            //Make sure Staff and Course details are in memory
+            if (result.StaffID != null)
+            {
+                var person = await db.People.SingleOrDefaultAsync(p => p.ID == result.StaffID);
+            }
+
+            if (result.CourseID != null)
+            {
+                var person = await db.Courses.SingleOrDefaultAsync(c => c.ID == result.CourseID);
+            }
+
+            return CreatedAtRoute("DefaultApi", new { id = result.ID }, new ResultDTO(result));
         }
 
         /// <summary>
@@ -196,31 +233,73 @@ namespace E_LearnAPI.Controllers
         {
             if (eLResult.StaffID == null)
             {
+                List<string> errors = new List<string>();
                 if (eLResult.Employee > 0)
                 {
                     //Find Person
                     var person = await db.People.SingleOrDefaultAsync(p => p.ESRID == eLResult.Employee);
                     if (person == null)
                     {
-                        eLResult.Comments = "Unable to find staff member with matching employee number";
-                        await db.SaveChangesAsync();
-                        return;
+                        errors.Add($"Unable to find staff member matching employee number {eLResult.Employee}");
                     }
-                    eLResult.StaffID = person.ID;
+                    else
+                    {
+                        eLResult.StaffID = person.ID;
+                    }                   
+                }
+
+                if (!string.IsNullOrWhiteSpace(eLResult.UserName) && eLResult.StaffID == null)
+                {
+                    try
+                    {
+                        var person = await db.People.SingleOrDefaultAsync(p => p.EMail == eLResult.UserName);
+                        if (person == null)
+                        {
+                            errors.Add($"Unable to find staff member with E-Mail: {eLResult.UserName}");
+                        }
+                        else
+                        {
+                            eLResult.StaffID = person.ID;
+                        }
+                    }
+                    catch(InvalidOperationException)
+                    {
+                        errors.Add($"Multiple Staff records have E-Mail address: {eLResult.UserName}");
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(eLResult.UserName) && eLResult.Employee <= 0)
+                {
+                    errors.Add("No data items to identify staff member present in data!");
+                }
+
+                if (eLResult.StaffID == null)
+                {
+                    eLResult.Comments = string.Join(", ", errors);
+                    await db.SaveChangesAsync();
+                    return;
                 }
             }
             
             if (eLResult.CourseID == null)
             {
                 //Find Course
-                var course = await db.Courses.SingleOrDefaultAsync(c => c.CourseName == eLResult.ModuleName);
-                if (course == null)
+                var map = await db.CourseMaps.SingleOrDefaultAsync(c => c.ModuleName == eLResult.ModuleName);
+                if (map == null)
                 {
-                    eLResult.Comments = $"Unable to find course matching {eLResult.ModuleName}";
-                    await db.SaveChangesAsync();
-                    return;
+                    var course = await db.Courses.SingleOrDefaultAsync(c => c.CourseName == eLResult.ModuleName);
+                    if (course == null)
+                    {
+                        eLResult.Comments = $"Unable to find course matching {eLResult.ModuleName}";
+                        await db.SaveChangesAsync();
+                        return;
+                    }
+                    eLResult.CourseID = course.ID;
                 }
-                eLResult.CourseID = course.ID;
+                else
+                {
+                    eLResult.CourseID = map.CourseID;
+                }                
             }
             
             
@@ -237,19 +316,8 @@ namespace E_LearnAPI.Controllers
             if (eLResult.CompletionDate != null)
             {
                 req.Status = (short)5;
-
-                //Puts additional information in requirement comment.
-                //if ((bool)(eLResult.PassFail))
-                //{
-                //    req.Status = (short)5;
-                //    req.Comments = "Passed: " + eLResult.Received.ToShortDateString();
-                //}
-                //else
-                //{
-                //    int attempts = await db.ELResults.Where(r => r.PersonId == person.ESRID && r.CourseId == course.ID && r.PassFail == false).CountAsync();
-                //    req.Status = (short)2;
-                //    req.Comments = "Number of Attempts: " + attempts.ToString();
-                //}
+                req.Comments = "Course completed via e-learning.";
+                
             }
             else
             {
@@ -259,6 +327,7 @@ namespace E_LearnAPI.Controllers
             }
             //Update Result
             eLResult.Processed = true;
+            eLResult.Comments += string.Format(" Processed: {0:d}", DateTime.Now);
             await db.SaveChangesAsync();
         }
 

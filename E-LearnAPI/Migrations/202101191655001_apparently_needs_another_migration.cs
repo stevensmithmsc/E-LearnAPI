@@ -7,14 +7,12 @@ namespace E_LearnAPI.Migrations
     {
         public override void Up()
         {
-            AddColumn("train.ESRModules", "Received", c => c.DateTime(nullable: false));
-            DropColumn("train.ESRModules", "Recieved");
+            Sql("ALTER TABLE train.ESRModules  ADD CONSTRAINT DF_ESRMod_Rec  DEFAULT GETDATE() FOR Received");
         }
         
         public override void Down()
         {
-            AddColumn("train.ESRModules", "Recieved", c => c.DateTime(nullable: false));
-            DropColumn("train.ESRModules", "Received");
+            
         }
     }
 }
