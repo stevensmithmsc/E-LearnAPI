@@ -16,7 +16,7 @@ using E_LearnAPI.DTOs;
 namespace E_LearnAPI.Controllers
 {
     /// <summary>
-    /// Handles messages regarding E-Laerning Results
+    /// Handles messages regarding E-Learning Results
     /// </summary>
     public class ELResultsController : ApiController
     {
@@ -25,9 +25,12 @@ namespace E_LearnAPI.Controllers
         /// <summary>
         /// Gets a list of E-Learning Results from the database.
         /// </summary>
-        /// <param name="search">Optional String Parameter, will search Person Name for any name containing parameter, if included.</param>
+        /// <param name="search">Optional String Parameter, will search Person Name for any name containing parameter, if included.
+        /// If single name provided with search for either forename or surname matching name.
+        /// If two names provided, will search first name against forename and second name against surname.
+        /// More than two names will return bad request.</param>
         /// <param name="processed">Optional Boolean Parameter, will search the Processed field for matching results, if included.</param>
-        /// <returns>List of upto 200 E-Laerning Results.</returns>
+        /// <returns>List of upto 200 E-Learning Results.</returns>
         [Authorize]
         // GET: api/ELResults
         [ResponseType(typeof(IEnumerable<ResultDTO>))]
@@ -141,12 +144,12 @@ namespace E_LearnAPI.Controllers
         }
 
         /// <summary>
-        /// Receives an E-Learning Result, will populate Received, FromADAcc and Processed fields
+        /// Receives an E-Learning Result, will populate Received, Source and Processed fields
         /// and then attempt to process the E-Learning result before saving it to the database.
         /// Uses CORS, will accept messages from anywhere.
         /// </summary>
         /// <param name="eLResult">This is the E-Learning Result</param>
-        /// <returns>The e-laerning result with additional fields populated.</returns>
+        /// <returns>The e-learning result with additional fields populated.</returns>
         // POST: api/ELResults
         [ResponseType(typeof(ResultDTO))]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -198,7 +201,7 @@ namespace E_LearnAPI.Controllers
         /// <returns>The deleted E-Learning result/</returns>
         [Authorize]
         // DELETE: api/ELResults/5
-        [ResponseType(typeof(ESRModules))]
+        [ResponseType(typeof(ResultDTO))]
         public async Task<IHttpActionResult> DeleteELResult(int id)
         {
             var eLResult = await db.ESRs.FindAsync(id);
@@ -210,7 +213,18 @@ namespace E_LearnAPI.Controllers
             db.ESRs.Remove(eLResult);
             await db.SaveChangesAsync();
 
-            return Ok(eLResult);
+            //Make sure Staff and Course details are in memory
+            if (eLResult.StaffID != null)
+            {
+                var person = await db.People.SingleOrDefaultAsync(p => p.ID == eLResult.StaffID);
+            }
+
+            if (eLResult.CourseID != null)
+            {
+                var person = await db.Courses.SingleOrDefaultAsync(c => c.ID == eLResult.CourseID);
+            }
+
+            return Ok(new ResultDTO(eLResult));
         }
 
         protected override void Dispose(bool disposing)
