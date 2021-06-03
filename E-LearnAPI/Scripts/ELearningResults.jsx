@@ -457,8 +457,11 @@ class ELearningResultsApp extends React.Component {
                 <Paginator vis={this.state.totalPages > 1 ? true : false} pages={this.state.totalPages > 5 ? 5 : this.state.totalPages} startAt={this.state.startAt} current={this.state.currentPage} increasePage={this.handleIncreasePage.bind(this)} decreasePage={this.handleDecreasePage.bind(this)} goToPage={this.handleGoToPage}/>
                 <EditForm record={this.state.selected} accessLevel={this.state.accessLevel} editResult={this.handleEditResult.bind(this)} deleteResult={this.handleDeleteResult.bind(this)}/>
                 <hr />
-                <h4>Manually Add Result:</h4>
-                <ELearnForm newResult={this.handleNewResult.bind(this)}/>
+                {this.state.accessLevel > 0 ? 
+                    <div>    
+                        <h4>Manually Add Result:</h4>
+                        <ELearnForm newResult={this.handleNewResult.bind(this)} />
+                    </div> : ""}
             </div>
         );
     }

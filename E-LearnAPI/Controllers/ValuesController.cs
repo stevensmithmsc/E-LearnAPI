@@ -26,7 +26,7 @@ namespace E_LearnAPI.Controllers
         public byte Get()
         {
             var userAccess = db.People.SingleOrDefault(p => p.ADAccount == User.Identity.Name);
-            if (userAccess != null)
+            if (userAccess != null && userAccess.ReportAccess != null)
             {
                 byte AccLvl = userAccess.ReportAccess.AccessLevel;
                 return AccLvl;
